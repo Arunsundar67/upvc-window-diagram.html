@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UPVC Window Visualizer</title>
+  <style>
+    body {
+      margin: 0;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+  </style>
+</head>
+<body>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const type = (urlParams.get('type') || 'Casement').toLowerCase();
+  const width = parseInt(urlParams.get('width') || '1200');
+  const height = parseInt(urlParams.get('height') || '1500');
+
+  const maxSVGWidth = 400;
+  const maxSVGHeight = 500;
+  const scale = Math.min(maxSVGWidth / width, maxSVGHeight / height);
+  const scaledWidth = width * scale;
+  const scaledHeight = height * scale;
+
+  const baseX = 50;
+  const baseY = 50;
+  const frameColor = "#cccccc";
+  const sashColor = "#e6f7ff";
+
+  let sashSVG = "";
+  if (type === "sliding") {
+    sashSVG = `
+      <line x1="${baseX + scaledWidth / 2}" y1="${baseY}" x2="${baseX + scaledWidth / 2}" y2="${baseY + scaledHeight}" stroke="#666" stroke-width="2"/>
+    `;
+  } else if (type === "casement") {
+    sashSVG = `
+      <line x1="${baseX}" y1="${baseY + scaledHeight / 2}" x2="${baseX + scaledWidth}" y2="${baseY + scaledHeight / 2}" stroke="#666" stroke-width="2"/>
+    `;
+  } else if (type === "tiltturn") {
+    sashSVG = `
+      <line x1="${baseX}" y1="${baseY}" x2="${baseX + scaledWidth}" y2="${baseY + scaledHeight}" stroke="#666" stroke-width="2"/>
+    `;
+  }
+
+  const svg = `
+    <svg width="${maxSVGWidth + 100}" height="${maxSVGHeight + 100}" xmlns="http://www.w3.org/2000/svg">
+      <rect x="${baseX - 5}" y="${baseY - 5}" width="${scaledWidth + 10}" height="${scaledHeight + 10}" fill="${frameColor}" stroke="#000" stroke-width="2"/>
+      <rect x="${baseX}" y="${baseY}" width="${scaledWidth}" height="${scaledHeight}" fill="${sashColor}" stroke="#000" stroke-width="1"/>
+      ${sashSVG}
+      <text x="${baseX}" y="${baseY - 10}" font-size="14" font-family="monospace">Width: ${width}mm</text>
+      <text x="${baseX + scaledWidth + 10}" y="${baseY + scaledHeight / 2}" font-size="14" transform="rotate(90, ${baseX + scaledWidth + 10}, ${baseY + scaledHeight / 2})" font-family="monospace">Height: ${height}mm</text>
+      <text x="${baseX}" y="${baseY + scaledHeight + 25}" font-size="16" font-weight="bold" font-family="monospace">${type.charAt(0).toUpperCase() + type.slice(1)} Window</text>
+    </svg>
+  `;
+
+  document.body.innerHTML = svg;
+</script>
+</body>
+</html>
